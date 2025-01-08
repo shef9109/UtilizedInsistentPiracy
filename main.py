@@ -4,11 +4,14 @@ from methods.get import get_file
 from methods.put import put_file
 from methods.delete import delete_file
 from methods.mkcol import mkcol
+import os
+import uvicorn
+from importlib import import_module
 
-    # Создаем объект приложения
+# Создаем объект приложения
 app = FastAPI()
 
-    # Регистрация маршрутов
+# Регистрация маршрутов
 @app.route("/{path:path}", methods=["PROPFIND"])
 async def handle_propfind(path: str, request: Request):
     return await propfind(path, request)
@@ -34,7 +37,21 @@ async def handle_mkcol(path: str):
 async def read_root():
     return {"message": "WebDAV Server is running"}
 
+    # Функция Bootstrap
+def bootstrap():
+    modul = os.path(os.getenv())
+    for path in modul.iterdir('/env'):  # Проход по всем возможным путям
+        if path.is_file() and path.suffix == '.py':
+            modul_get = import_module(path.stem())
+            for r in modul_get:  # Регистрация роутеров
+                app.include_router(r)
+    for mod in os.path(os.getenv()).iterdir():
+        mod_get = import_module(mod.stem + '.py')
+        for method in mod_get.__dict__.keys():
+            if method ==:
+                app.add_api_route
+
     # Запуск сервера через uvicorn
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, reload=True)
